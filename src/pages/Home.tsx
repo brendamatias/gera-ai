@@ -55,7 +55,7 @@ export const Home = () => {
 
       <hr className="border-t border-black opacity-20 my-[30px]" />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-10 items-stretch">
         <PreviewImage
           ref={previewRef}
           imageFile={imageFile}

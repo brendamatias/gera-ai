@@ -47,11 +47,15 @@ const PreviewImage = forwardRef<PreviewImageHandle, PreviewImageProps>(
         ref={containerRef}
         role="img"
         aria-label={`${topText} ${bottomText}`}
-        className="h-full relative max-h-[416px] w-full bg-gray-200 rounded-[6px] overflow-hidden flex items-center justify-center"
+        className="relative w-full h-[300px] md:h-full bg-gray-200 rounded-[6px] overflow-hidden flex items-center justify-center"
       >
         {imageSrc ? (
           <>
-            <img src={imageSrc} alt="Preview" className="object-contain" />
+            <img
+              src={imageSrc}
+              alt="Preview"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
 
             <OverlayText text={topText} fontSize={topSize} position="top" />
             <OverlayText
