@@ -2,7 +2,9 @@ import { Button, Input, PreviewImage, Slider } from "@/components";
 import logo from "@/assets/logo.png";
 import { useForm, Controller } from "react-hook-form";
 import { Download } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import html2canvas from "html2canvas-pro";
+import { generateFilename } from "@/utils";
 
 type FormValues = {
   image: FileList;
@@ -13,6 +15,8 @@ type FormValues = {
 };
 
 export const Home = () => {
+  const previewRef = useRef<HTMLDivElement>(null);
+
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const { register, handleSubmit, control, watch } = useForm<FormValues>({
@@ -22,16 +26,26 @@ export const Home = () => {
     },
   });
 
-  const topText = watch("topText");
-  const bottomText = watch("bottomText");
-  const topSize = watch("topSize")?.[0] ?? 33;
-  const bottomSize = watch("bottomSize")?.[0] ?? 33;
+  const [image, topText, bottomText, topSize, bottomSize] = watch([
+    "image",
+    "topText",
+    "bottomText",
+    "topSize",
+    "bottomSize",
+  ]);
 
-  const imageFileList = watch("image");
-  const imageFile = imageFileList?.[0];
+  const imageFile = image?.[0];
 
-  const onSubmit = (data: FormValues) => {
-    console.log("Form data:", data);
+  const onSubmit = async () => {
+    if (!previewRef.current) return;
+
+    const canvas = await html2canvas(previewRef.current);
+    const dataUrl = canvas.toDataURL("image/png");
+
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = generateFilename("meme", "png");
+    link.click();
   };
 
   useEffect(() => {
@@ -51,14 +65,15 @@ export const Home = () => {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="grid grid-cols-2 gap-10 items-stretch"
+        className="grid grid-cols-1 md:grid-cols-2 gap-10 items-stretch"
       >
         <PreviewImage
+          ref={previewRef}
           imageSrc={imagePreview}
           topText={topText}
-          topSize={topSize}
+          topSize={topSize?.[0]}
           bottomText={bottomText}
-          bottomSize={bottomSize}
+          bottomSize={bottomSize?.[0]}
         />
 
         <div className="flex flex-col justify-between">
@@ -67,6 +82,7 @@ export const Home = () => {
               label="Imagem"
               type="file"
               required
+              accept="image/*"
               {...register("image", { required: true })}
             />
             <Input
