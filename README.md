@@ -1,8 +1,8 @@
-<h1 align="center">🕹️ Nome do projeto</h1>
-<p align="center">Breve descrição.</p>
+<h1 align="center">Gera aí 😜</h1>
+<p align="center">Crie memes personalizados com texto, imagem e humor.</p>
 
 <p align="center">
-  🔗 <a href="https://url" target="_blank"><strong>Visualizar projeto</strong></a>
+  🔗 <a href="http://gera-ai.codaki.com.br/" target="_blank"><strong>Visualizar projeto</strong></a>
 </p>
 
 ---
@@ -35,10 +35,10 @@
 
 ```bash
 # Clone o repositório
-git clone https://github.com/brendamatias/seu-projeto.git
+git clone https://github.com/brendamatias/gera-ai.git
 
 # Acesse a pasta do projeto
-cd seu-projeto
+cd gera-ai
 
 # Instale as dependências
 npm install
@@ -67,5 +67,5 @@ Este projeto está sob a licença [MIT](./LICENSE).
 
 ## ✨ Autor
 
-Feito com 💜 por [Brenda Matias](https://github.com/brendamatias)
-[🔗 LinkedIn](https://www.linkedin.com/in/brendamatias/)
+Feito com 💜 por [Brenda Matias](https://github.com/brendamatias)<br />
+[🔗 LinkedIn](https://www.linkedin.com/in/brenda-matias/)
