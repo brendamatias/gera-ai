@@ -1,28 +1,32 @@
-import { Button, Input, PreviewImage, Slider } from "@/components";
 import logo from "@/assets/logo.png";
 import { useForm, Controller } from "react-hook-form";
 import { Download } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import html2canvas from "html2canvas-pro";
-import { generateFilename } from "@/utils";
+import { useRef, useState } from "react";
+
+import {
+  Button,
+  Input,
+  PreviewImage,
+  Slider,
+  type PreviewImageHandle,
+} from "@/components";
 
 type FormValues = {
   image: FileList;
   topText: string;
-  topSize: number[];
+  topSize: number;
   bottomText: string;
-  bottomSize: number[];
+  bottomSize: number;
 };
 
 export const Home = () => {
-  const previewRef = useRef<HTMLDivElement>(null);
-
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const previewRef = useRef<PreviewImageHandle>(null);
+  const [loading, setLoading] = useState(false);
 
   const { register, handleSubmit, control, watch } = useForm<FormValues>({
     defaultValues: {
-      topSize: [33],
-      bottomSize: [33],
+      topSize: 33,
+      bottomSize: 33,
     },
   });
 
@@ -35,27 +39,15 @@ export const Home = () => {
   ]);
 
   const imageFile = image?.[0];
+  const isValid = !!(imageFile && topText && bottomText);
 
   const onSubmit = async () => {
-    if (!previewRef.current) return;
+    if (!isValid) return;
 
-    const canvas = await html2canvas(previewRef.current);
-    const dataUrl = canvas.toDataURL("image/png");
-
-    const link = document.createElement("a");
-    link.href = dataUrl;
-    link.download = generateFilename("meme", "png");
-    link.click();
+    setLoading(true);
+    await previewRef.current?.capture();
+    setLoading(false);
   };
-
-  useEffect(() => {
-    if (!imageFile) return;
-
-    const url = URL.createObjectURL(imageFile);
-    setImagePreview(url);
-
-    return () => URL.revokeObjectURL(url);
-  }, [imageFile]);
 
   return (
     <div className="space-y-4">
@@ -63,20 +55,17 @@ export const Home = () => {
 
       <hr className="border-t border-black opacity-20 my-[30px]" />
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="grid grid-cols-1 md:grid-cols-2 gap-10 items-stretch"
-      >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-stretch">
         <PreviewImage
           ref={previewRef}
-          imageSrc={imagePreview}
+          imageFile={imageFile}
           topText={topText}
-          topSize={topSize?.[0]}
+          topSize={topSize}
           bottomText={bottomText}
-          bottomSize={bottomSize?.[0]}
+          bottomSize={bottomSize}
         />
 
-        <div className="flex flex-col justify-between">
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-6">
             <Input
               label="Imagem"
@@ -98,7 +87,8 @@ export const Home = () => {
                   label="Tamanho texto superior:"
                   value={field.value}
                   onValueChange={field.onChange}
-                  max={100}
+                  min={8}
+                  max={80}
                   step={1}
                 />
               )}
@@ -116,19 +106,25 @@ export const Home = () => {
                   label="Tamanho texto inferior:"
                   value={field.value}
                   onValueChange={field.onChange}
-                  max={100}
+                  min={8}
+                  max={80}
                   step={1}
                 />
               )}
             />
           </div>
 
-          <Button type="submit" className="w-full mt-6">
-            <Download className="mr-2" />
+          <Button
+            type="submit"
+            className="w-full mt-6"
+            disabled={!isValid}
+            loading={loading}
+            icon={<Download />}
+          >
             Download
           </Button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

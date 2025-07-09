@@ -1,20 +1,50 @@
 import { cn } from "@/lib";
+import { captureAndDownloadImage, generateFilename } from "@/utils";
 import { Image } from "lucide-react";
-import { forwardRef } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
+
+export interface PreviewImageHandle {
+  capture: () => Promise<void>;
+}
 
 interface PreviewImageProps {
-  imageSrc: string | null;
+  imageFile?: File;
   topText: string;
   topSize: number;
   bottomText: string;
   bottomSize: number;
 }
 
-const PreviewImage = forwardRef<HTMLDivElement, PreviewImageProps>(
-  ({ imageSrc, topText, topSize, bottomText, bottomSize }, ref) => {
+const PreviewImage = forwardRef<PreviewImageHandle, PreviewImageProps>(
+  ({ imageFile, topText, topSize, bottomText, bottomSize }, ref) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [imageSrc, setImageSrc] = useState<string | null>(null);
+
+    useImperativeHandle(ref, () => ({
+      capture: async () => {
+        if (!containerRef.current) return;
+        await captureAndDownloadImage(containerRef, generateFilename("meme"));
+      },
+    }));
+
+    useEffect(() => {
+      if (!imageFile) return;
+
+      const url = URL.createObjectURL(imageFile);
+      setImageSrc(url);
+
+      return () => URL.revokeObjectURL(url);
+    }, [imageFile]);
+
     return (
       <div
-        ref={ref}
+        ref={containerRef}
         role="img"
         aria-label={`${topText} ${bottomText}`}
         className="h-full relative max-h-[416px] w-full bg-gray-200 rounded-[6px] overflow-hidden flex items-center justify-center"
